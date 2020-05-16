@@ -1,0 +1,7 @@
+#ENVIROMENT VARIABLES
+
+PORT=8081
+DB_HOST=localhost
+DB_USERNAME=prevcrim
+DB_PASSWORD=Elzfu4VNo7pxGW7s
+DB=prevcrimdb
