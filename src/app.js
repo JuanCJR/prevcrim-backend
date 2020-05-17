@@ -23,7 +23,11 @@ app.use(cors());
 app.use(passport.initialize()); //Indicamos a passport que se inicie
 app.use(passport.session());
 
+//Configuracion para permitir el uso de archivos json
+app.use(express.json());
+
 //Rutas
+app.use("/api/users", require('./routes/authentication')); //Ruta para el manejo de usuarios
 
 app.get("/", (req, res) => {
   res.json({ message: "ok" });
