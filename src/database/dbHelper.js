@@ -31,4 +31,9 @@ dbHelper.CreaUsuario = async (infoUsuario) => {
   });
 };
 
+//Funcion para listar usuarios
+dbHelper.ListarUsuario = async () => {
+  
+};
+
 module.exports = dbHelper;

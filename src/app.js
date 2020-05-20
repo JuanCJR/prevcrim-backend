@@ -1,7 +1,7 @@
 const path = require("path");
-const dotenv = require("dotenv");
-dotenv.config({ path: path.join(__dirname, "../.env") });
-const express = require("express");
+const dotenv = require("dotenv"); //Paquete para habilitar variables de entorno
+dotenv.config({ path: path.join(__dirname, "../.env") }); //configuracion de dotenv
+const express = require("express"); //Framework para levantar servidor
 const passport = require("passport");
 const cors = require("cors");
 const pool = require("./database/dataBase");
@@ -28,6 +28,7 @@ app.use(express.json());
 
 //Rutas
 app.use("/api/users", require('./routes/authentication')); //Ruta para el manejo de usuarios
+
 
 app.get("/", (req, res) => {
   res.json({ message: "ok" });
