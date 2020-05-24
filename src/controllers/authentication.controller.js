@@ -41,10 +41,10 @@ AuthCtrl.creaUsuario = async (req, res) => {
 //Funcion para listar usuarios
 AuthCtrl.listaUsuarios = async (req, res) => {
   
-  //const usuarios = await dbHelper.ListarUsuario();
+  const usuarios = await dbHelper.ListarUsuario();
 
   
-  //res.json(usuarios);
+  res.json(usuarios);
 };
 
 AuthCtrl.creaOperador = (req, res) => {};
