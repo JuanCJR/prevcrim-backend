@@ -34,7 +34,7 @@ dbHelper.CreaUsuario = async (infoUsuario) => {
 //Funcion para listar usuarios
 dbHelper.ListarUsuario = async () => {
   const listado = await pool.query("select * from usuarios");
-  
+  return listado;
 };
 
 module.exports = dbHelper;
