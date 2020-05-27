@@ -38,13 +38,16 @@ dbHelper.ListarUsuario = async () => {
 };
 
 //funcion para eliminar usuarios
-
-dbHelper.EliminarUsuarios= async (rut_usuario) =>{
-  
-  const eliminarDomicilio = await pool.query (
-    "delete from domicilios join usuarios on usuarios.cod_domicilio=domicilio.cod_domicilio where rut_usuario = ?", [rut_usuario]);
-
-    const eliminar = await pool.query ("delete from usuarios where rut_usuario = ?", [rut_usuario]);
+dbHelper.EliminarUsuarios = async (rut_usuario) => {
+  const eliminaDataUsuario = await pool.query(
+    "delete domicilios,usuarios from domicilios join usuarios on usuarios.cod_domicilio=domicilios.cod_domicilio where rut_usuario = ?",
+    [rut_usuario]
+  );
+  if (eliminaDataUsuario.affectedRows > 0) {
+    return { mensaje: "ok" };
+  } else {
+    return { mensaje: "error" };
+  }
 };
 
 module.exports = dbHelper;

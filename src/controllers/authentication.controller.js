@@ -17,7 +17,6 @@ AuthCtrl.creaUsuario = async (req, res) => {
     codComuna,
     creadoPor,
   } = req.body;
-  console.log(req.body);
   //Objeto de informacion del usuario
   const infoUsuario = {
     rut,
@@ -47,11 +46,9 @@ AuthCtrl.listaUsuarios = async (req, res) => {
 };
 
 AuthCtrl.eliminarUsuarios = async (req, res) => {
-
-  const {rut_usuario} = req.body;
-  const eliminar = await dbHelper.EliminarUsuarios();
- 
-  res.json(eliminar)
+  const { rut_usuario } = req.body;
+  const eliminar = await dbHelper.EliminarUsuarios(rut_usuario);
+  res.json(eliminar);
 };
 
 AuthCtrl.creaOperador = (req, res) => {};

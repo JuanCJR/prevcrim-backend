@@ -1,10 +1,6 @@
 const express = require("express");
 const router = express.Router();
-<<<<<<< HEAD
-const { creaUsuario, eliminarUsuarios} = require("../controllers/authentication.controller");
-=======
-const { creaUsuario,listaUsuarios} = require("../controllers/authentication.controller");
->>>>>>> 387457cce209b738074b157d7f60d0c96e41defd
+const { creaUsuario, eliminarUsuarios,listaUsuarios} = require("../controllers/authentication.controller");
 
 
 router.route("/creausuario").post(creaUsuario); // Ruta para la creacion de usuarios
