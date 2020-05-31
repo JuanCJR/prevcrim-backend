@@ -44,11 +44,18 @@ AuthCtrl.listaUsuarios = async (req, res) => {
 
   res.json(usuarios);
 };
-
+//Funcion para eliminar usuarios
 AuthCtrl.eliminarUsuarios = async (req, res) => {
   const { rut_usuario } = req.body;
   const eliminar = await dbHelper.EliminarUsuarios(rut_usuario);
   res.json(eliminar);
+};
+
+//Funcion para actualizar usuarios
+AuthCtrl.actualizarUsuarios = async (req, res) => {
+  const { rut_usuario} = req.body;
+  const actualizar = await dbHelper.ActualizarUsuarios(rut_usuario);
+  res.json(actualizar);
 };
 
 AuthCtrl.creaOperador = (req, res) => {};
