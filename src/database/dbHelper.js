@@ -53,7 +53,7 @@ dbHelper.EliminarUsuarios = async (rut_usuario) => {
 //funcion para actualizar usuarios
 dbHelper.ActualizarUsuarios = async (infoUsuario) => {
    const actualizaDomicilioUsuario =await pool.query(
-    "update domicilios SET cod_domicilio= ?, calle= ?, numero= ?, numero_domicilio= ?, cod_comuna= ?, modificado_por: ? where rut_usuario = ? ",
+    "update domicilios SET cod_domicilio= ?, calle= ?, numero= ?, numero_domicilio= ?, cod_comuna= ?, modificado_por: ? from domicilios inner join usuarios on usuarios.cod_domicilio=domicilios.cod_domicilio where rut_usuario = ? ",
     [cod_domicilio, infoUsuario.calle, infoUsuario.numero, infoUsuario.numeroDomicilio, infoUsuario.codComuna, infoUsuario.creadoPor, infoUsuario.rut_usuario]
    )
     const claveActualizada = await helpers.encryptPassword(infoUsuario.clave);
