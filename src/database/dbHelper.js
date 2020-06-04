@@ -52,16 +52,34 @@ dbHelper.EliminarUsuarios = async (rut_usuario) => {
 
 //funcion para actualizar usuarios
 dbHelper.ActualizarUsuarios = async (infoUsuario) => {
-   const actualizaDomicilioUsuario =await pool.query(
-    "update domicilios SET cod_domicilio= ?, calle= ?, numero= ?, numero_domicilio= ?, cod_comuna= ?, modificado_por: ? from domicilios inner join usuarios on usuarios.cod_domicilio=domicilios.cod_domicilio where rut_usuario = ? ",
-    [cod_domicilio, infoUsuario.calle, infoUsuario.numero, infoUsuario.numeroDomicilio, infoUsuario.codComuna, infoUsuario.creadoPor, infoUsuario.rut_usuario]
-   )
-    const claveActualizada = await helpers.encryptPassword(infoUsuario.clave);
+  
+  const actualizaDomicilioUsuario = await pool.query(
+    `update domicilios join usuarios on usuarios.cod_domicilio=domicilios.cod_domicilio 
+    SET domicilios.modificado_por = ?,calle= ?, numero= ?, numero_domicilio= ?, cod_comuna= ? 
+    where rut_usuario = ?`,
+    [
+      infoUsuario.modificadoPor,
+      infoUsuario.calle,
+      infoUsuario.numero,
+      infoUsuario.numeroDomicilio,
+      infoUsuario.codComuna,
+      infoUsuario.rut,
+    ]
+  );
+  const claveActualizada = await helpers.encryptPassword(infoUsuario.clave);
 
-    const actualizaDataUsuario = await pool.query(
-      "update usuarios SET nombre_usuario= ?, nombres= ?, apellidos= ?, email= ?, clave= ?, cod_domicilio= ?, tipo_usuario= ?, modificado_por= ? where rut_usuario = ?",
-      [infoUsuario.nombreUsuario, infoUsuario.nombres, infoUsuario.apellidos, infoUsuario.email, claveActualizada, cod_domicilio, infoUsuario.tipoUsuario, infoUsuario.creadoPor]
-    );
+  const actualizaDataUsuario = await pool.query(
+    "update usuarios SET nombres= ?, apellidos= ?, email= ?, clave= ?, tipo_usuario= ?, modificado_por= ? where rut_usuario = ?",
+    [
+      infoUsuario.nombres,
+      infoUsuario.apellidos,
+      infoUsuario.email,
+      claveActualizada,
+      infoUsuario.tipoUsuario,
+      infoUsuario.modificadoPor,
+      infoUsuario.rut,
+    ]
+  );
 };
 
 module.exports = dbHelper;

@@ -27,7 +27,8 @@ app.use(passport.session());
 app.use(express.json());
 
 //Rutas
-app.use("/api/users", require('./routes/authentication')); //Ruta para el manejo de usuarios
+app.use("/api/authentication", require('./routes/authentication')); //Ruta para el manejo de autenticacion
+app.use("/api/users", require('./routes/user')); //Ruta para el manejo de usuarios
 
 
 app.get("/", (req, res) => {
