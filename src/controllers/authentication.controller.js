@@ -2,90 +2,76 @@ AuthCtrl = {};
 const helpers = require("../lib/helpers");
 const pool = require("../database/dataBase");
 
-const dbHelper = require("../database/dbHelper");
 //funcion para crear usuario
 AuthCtrl.creaUsuario = async (req, res) => {
-  const {
-    rut,
-    nombreUsuario,
-    nombres,
-    apellidos,
-    clave,
-    tipoUsuario,
-    calle,
-    email,
-    numero,
-    numeroDomicilio,
-    codComuna,
-    creadoPor,
-  } = req.body;
-  //Objeto de informacion del usuario
-  const infoUsuario = {
-    rut,
-    nombreUsuario,
-    nombres,
-    apellidos,
-    clave,
-    tipoUsuario,
-    calle,
-    email,
-    numero,
-    numeroDomicilio,
-    codComuna,
-    creadoPor,
-  };
+  const { infoUsuario } = req.body;
 
-  const domicilios = await pool.query(
-    "SELECT count(*) as count FROM domicilios"
-  );
-  const cod_domicilio = domicilios[0].count + 1;
-  await pool.query("INSERT INTO domicilios SET ?", {
-    cod_domicilio: cod_domicilio,
-    calle: calle,
-    numero: numero,
-    numero_domicilio: numeroDomicilio,
-    cod_comuna: codComuna,
-    modificado_por: creadoPor,
+  const domicilio = await pool.query("INSERT INTO domicilios SET ?", {
+    calle: infoUsuario.calle,
+    numero: infoUsuario.numero,
+    numero_domicilio: infoUsuario.numeroDomicilio,
+    cod_comuna: infoUsuario.codComuna,
+    modificado_por: infoUsuario.creadoPor,
   });
 
-  const claveEncrypt = await helpers.encryptPassword(clave);
 
+  const claveEncrypt = await helpers.encryptPassword(infoUsuario.clave);
   const usuario = await pool.query("INSERT INTO usuarios SET ?", {
-    rut_usuario: rut,
-    nombre_usuario: nombreUsuario,
-    nombres: nombres,
-    apellidos: apellidos,
-    email: email,
+    rut_usuario: infoUsuario.rut,
+    nombre_usuario: infoUsuario.nombreUsuario,
+    nombres: infoUsuario.nombres,
+    apellidos: infoUsuario.apellidos,
+    email: infoUsuario.email,
     clave: claveEncrypt,
-    cod_domicilio: cod_domicilio,
-    tipo_usuario: tipoUsuario,
-    modificado_por: creadoPor,
+    cod_domicilio: domicilio.insertId,
+    tipo_usuario: infoUsuario.tipoUsuario,
+    modificado_por: infoUsuario.creadoPor,
+    cod_institucion: infoUsuario.codInstitucion,
   });
 
   res.json({ message: "peticion recibida " });
 };
 
-//Funcion para listar usuarios
-AuthCtrl.listaUsuarios = async (req, res) => {
-  //  const usuarios = await dbHelper.ListarUsuario();
-  const usuarios = await pool.query("select * from usuarios");
+//Funcion pora el inicio de sesion
+AuthCtrl.Login = async (req, res) => {
+  const { usuario } = req.body;
+  const data = await pool.query(
+    `SELECT * FROM usuarios 
+  WHERE nombre_usuario = ? `,
+    [usuario.nombreUsuario]
+  );
 
-  console.log(usuarios);
-
-  res.json(usuarios);
+  //Valida que el usuario exista
+  if (data.length) {
+    //Funcion para comparar contraseñas, en caso de ser correcta devuelve true
+    const validaClave = await helpers.matchPassword(
+      usuario.clave,
+      data[0].clave
+    );
+    //Valida contraseña correcta
+    if (validaClave) {
+      res.json(data[0]);
+    } else {
+      res.json({
+        message: "La contraseña no es correcta",
+        code: "clave-false",
+      });
+    }
+  } else {
+    res.json({ message: "El usuario no existe", code: "usuario-false" });
+  }
 };
-//Funcion para eliminar usuarios
-AuthCtrl.eliminarUsuarios = async (req, res) => {
+
+//Funcion para reconectar
+AuthCtrl.reconectUser = async (req, res) => {
   const { rut_usuario } = req.body;
-  const eliminar = await dbHelper.EliminarUsuarios(rut_usuario);
-  res.json(eliminar);
-};
+  const data = await pool.query(
+    `SELECT * FROM usuarios 
+  WHERE rut_usuario = ? `,
+    [rut_usuario]
+  );
 
-//Funcion para actualizar usuarios
-AuthCtrl.actualizarUsuarios = async (req, res) => {
-  const { infoUsuario } = req.body;
-  const actualizar = await dbHelper.ActualizarUsuarios(infoUsuario);
-  res.json(actualizar);
+  res.json(data);
 };
 
 module.exports = AuthCtrl;
