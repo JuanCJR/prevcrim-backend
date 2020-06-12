@@ -1,5 +1,6 @@
 institucionesCtrl = {};
 const pool = require("../database/dataBase");
+const dbHelper = require("../database/dbHelper");
 
 //Crea Institucion
 institucionesCtrl.creaInstitucion = async (req, res) => {
@@ -22,10 +23,37 @@ institucionesCtrl.getInstituciones = async (req, res) => {
 
 //Eliminar instituciones
 institucionesCtrl.eliminaInstitucion = async (req, res) => {
+  const {cod_instituciones} =req.body;
+  const eliminaInstituciones = await pool.query(
+    `delete from instituciones where cod_instituciones = ?`, [cod_instituciones]
+  );
+    if (eliminaInstituciones.affectedRows > 0) {
+      res.json({
+        message: "Institucion Eliminada",
+        code: "delete-true",
+      });
+    } else {
+      res.json({
+        message: "No se ha eliminado la Institución",
+        code: "delete-false",
+      });
+    }
+};
 
-  const instituciones = await pool.query(
-    `delete from domicilios `
-    );
+//Actualizar instituciones
+institucionesCtrl.actualizarInstitucion =async (req,res) => {
+  const {institucionInfo} =req.body;
+  const actualizarInstituciones = await pool.query (
+    "update instituciones set nombre_institucion = ?, sectores= ?, modificado_por= ? where cod_instituciones= ?",
+    [
+      institucionInfo.nombreInstitucion,
+      0,
+      institucionInfo.creadoPor,
+      institucionInfo.cod_instituciones
+    ]
+  );
+
+
 };
 
 module.exports = institucionesCtrl;
