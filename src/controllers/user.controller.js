@@ -58,7 +58,7 @@ userCtrl.eliminarUsuario = async (req, res) => {
     });
   } else {
     res.json({
-      message: "No se ha liminado el usuario",
+      message: "No se ha eliminado el usuario",
       code: "delete-false",
     });
   }

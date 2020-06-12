@@ -20,4 +20,12 @@ institucionesCtrl.getInstituciones = async (req, res) => {
   res.json(instituciones);
 }; //
 
+//Eliminar instituciones
+institucionesCtrl.eliminaInstitucion = async (req, res) => {
+
+  const instituciones = await pool.query(
+    `delete from domicilios `
+    );
+};
+
 module.exports = institucionesCtrl;
