@@ -44,10 +44,9 @@ institucionesCtrl.eliminaInstitucion = async (req, res) => {
 institucionesCtrl.actualizarInstitucion =async (req,res) => {
   const {institucionInfo} =req.body;
   const actualizarInstituciones = await pool.query (
-    "update instituciones set nombre_institucion = ?, sectores= ?, modificado_por= ? where cod_instituciones= ?",
+    "update instituciones set nombre_institucion = ?, modificado_por= ? where cod_instituciones= ?",
     [
       institucionInfo.nombreInstitucion,
-      0,
       institucionInfo.creadoPor,
       institucionInfo.cod_instituciones
     ]
