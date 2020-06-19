@@ -14,7 +14,9 @@ AuthCtrl.creaUsuario = async (req, res) => {
     modificado_por: infoUsuario.creadoPor,
   });
 
-
+  if (infoUsuario.tipoUsuario === "1") {
+    infoUsuario.codInstitucion = 1;
+  }
   const claveEncrypt = await helpers.encryptPassword(infoUsuario.clave);
   const usuario = await pool.query("INSERT INTO usuarios SET ?", {
     rut_usuario: infoUsuario.rut,

@@ -30,7 +30,11 @@ app.use(express.json());
 app.use("/api/authentication", require("./routes/authentication")); //Ruta para el manejo de autenticacion
 app.use("/api/users", require("./routes/user")); //Ruta para el manejo de usuarios
 app.use("/api/address", require("./routes/address")); //Ruta para el manejo de direcciones
-app.use("/api/instituciones", require("./routes/instituciones"));
+app.use("/api/instituciones", require("./routes/instituciones")); //Ruta para manejo de instituciones
+app.use("/api/sectores", require("./routes/sectores")); //Ruta para manejo de sectores
+app.use("/api/operadores", require("./routes/operadores")); //Ruta para manejo de operadores
+app.use("/api/delitos", require("./routes/delitos")); //Ruta para manejo de delitos
+
 
 app.get("/", (req, res) => {
   res.json({ message: "ok" });
