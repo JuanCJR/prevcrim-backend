@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {nuevoSector,getSectores} = require("../controllers/sectores.controller");
+const {nuevoSector,getSectores, eliminaSectores} = require("../controllers/sectores.controller");
 
 
 //Funcion para crear sector
@@ -12,7 +12,7 @@ router.route("/obtener").post();
 //Funcion para modificar sector
 router.route("/modificar").post();
 //Funcion para liminar sector
-router.route("/eliminar").post();
+router.route("/eliminar").post(eliminaSectores);
 
 
 

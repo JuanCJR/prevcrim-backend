@@ -51,4 +51,56 @@ sectoresCtrl.getSectores = async (req, res) => {
   res.json(sectores);
 };
 
+//Funcion para eliminar sectores
+sectoresCtrl.eliminaSectores= async (req,res) =>{
+  const {cod_sector, cod_institucion} =  req.body;
+  const eliminaSectores = await pool.query(
+    'Delete from sectores where cod_sector = ? ', [cod_sector]
+  );
+  if (eliminaSectores.affectedRows > 0) {
+    res.json({
+      message: "Sector Eliminado",
+      code: "delete-true",
+    });
+  } else {
+    res.json({
+      message: "No se ha eliminado el Sector",
+      code: "delete-false",
+    });
+  }
+
+//Consigue numero de sectores por institucion
+const contadorSectores = await pool.query(
+  `SELECT COUNT(*) as nro_sectores 
+   from sectores 
+   WHERE
+   cod_institucion = ?`,
+  [sectorInfo.cod_institucion]
+);
+
+//actualiza el numero de sectores de la institucion
+await pool.query(
+  `UPDATE instituciones set sectores = ? WHERE 
+cod_institucion = ?`,
+  [contadorSectores[0].nro_sectores, sectorInfo.cod_institucion]
+);
+
+res.json({ message: "ok" });
+
+};
+
+//funcion para actualizar sectores
+sectoresCtrl.actualizaSectores = async (req,res)=>{
+const {sectorInfo}=req.body;
+const actualizaSectores= await pool.query(
+  'update sectores set nombre_sector= ?, desc_sector= ?, modificado_por= ?, where cod_sector = ?',
+  [
+    sectorInfo.nombre_sector,
+    sectorInfo.desc_sector,
+    sectorInfo.modificado_por,
+    sectorInfo.cod_sector
+  ]
+);
+};
+
 module.exports = sectoresCtrl;
