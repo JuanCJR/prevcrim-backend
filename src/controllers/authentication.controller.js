@@ -24,6 +24,7 @@ AuthCtrl.creaUsuario = async (req, res) => {
     nombres: infoUsuario.nombres,
     apellidos: infoUsuario.apellidos,
     email: infoUsuario.email,
+    fecha_nacimiento:infoUsuario.fecha_nacimiento,
     clave: claveEncrypt,
     cod_domicilio: domicilio.insertId,
     tipo_usuario: infoUsuario.tipoUsuario,

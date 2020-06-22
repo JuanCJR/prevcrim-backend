@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {nuevoDelito,getDelincuente,getDelitos} = require("../controllers/delitos.controller");
 
+
 //Funcion para crear delito
 router.route("/nuevo").post(nuevoDelito);
 //Funcion para listar delitos
@@ -10,7 +11,7 @@ router.route("/listar").get(getDelitos);
 router.route("/obtener").post();
 
 //Funcion para obtener delincuente en especifico
-router.route("/obtenerdelincuente").post(getDelincuente);
+router.route("/getdelincuente").post(getDelincuente);
 
 //Funcion para modificar delito
 router.route("/modificar").post();
