@@ -9,13 +9,13 @@ delitosCtrl.nuevoDelito = async (req, res) => {
   if (infoDelito.delincuenteRegistrado) {
     const delincuente = await pool.query(
       `SELECT * from delincuentes
-    WHERE cod_delincuente = ?`,
-      [infoDelito.cod_delincuente]
+    WHERE rut_delincuente = ?`,
+      [infoDelito.delincuente.rut_delincuente]
     );
 
     if (infoDelito.actualizaUltimoVisto) {
       //insercion en tabla de ultimo visto
-      const ultimo_visto = await pool.query(
+      await pool.query(
         `UPDATE ultimo_visto join delincuentes
       on delincuentes.cod_ultimo_visto = ultimo_visto.cod_ultimo_visto SET 
       calle = ?, numero = ?, numero_domicilio = ?, cod_comuna = ?, cod_sector = ?,
@@ -46,8 +46,8 @@ delitosCtrl.nuevoDelito = async (req, res) => {
     );
     //insercion en tabla de delitos
     await pool.query(`INSERT INTO delitos SET ? `, {
-      desc_delito: infoDelito.desc_delito,
-      tipo_delito: infoDelito.tipo_delito,
+      desc_delito: infoDelito.delito.desc_delito,
+      tipo_delito: infoDelito.delito.tipo_delito,
       cod_delincuente: delincuente[0].cod_delincuente,
       cod_direccion_delito: direccionDelito.insertId,
       modificado_por: infoDelito.creadoPor,
@@ -85,8 +85,6 @@ delitosCtrl.nuevoDelito = async (req, res) => {
       email: infoDelito.delincuente.email,
       fecha_nacimiento: infoDelito.delincuente.fecha_nacimiento,
       estado_civil: infoDelito.delincuente.estado_civil,
-      nombres_conyugue: infoDelito.delincuente.nombres_conyugue,
-      apellidos_conyugue: infoDelito.delincuente.apellidos_conyugue,
       cod_ultimo_visto: ultimo_visto.insertId,
       cod_domicilio: domicilio.insertId,
       modificado_por: infoDelito.creadorPor,
@@ -121,7 +119,11 @@ delitosCtrl.nuevoDelito = async (req, res) => {
 
 //funcion para listar delitos
 delitosCtrl.getDelitos = async (req, res) => {
-  const delitos = await pool.query("SELECT * FROM delitos");
+  const delitos = await pool.query(
+    `SELECT * FROM lg_info_delitos a
+    join lg_info_delincuentes b on b.cod_delincuente=a.cod_delincuente
+    order by a.cod_delito desc`
+  );
   res.json(delitos);
 };
 

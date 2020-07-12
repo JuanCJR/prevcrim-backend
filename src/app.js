@@ -5,6 +5,7 @@ const express = require("express"); //Framework para levantar servidor
 const passport = require("passport");
 const cors = require("cors");
 const pool = require("./database/dataBase");
+const bodyParser = require("body-parser");
 
 pool.getConnection((err) => {
   if (err) throw err;
@@ -17,6 +18,7 @@ const app = express();
 
 //Configuraciones
 app.set("port", process.env.PORT || 8082);
+app.use(bodyParser.json());
 
 //middlewares
 app.use(cors());
