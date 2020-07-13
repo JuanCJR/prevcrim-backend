@@ -9,7 +9,8 @@ userCtrl.obtieneUsuario = async (req, res) => {
     const usuario = await pool.query(
       `
   select usuarios.rut_usuario, usuarios.nombre_usuario, usuarios.apellidos,usuarios.email, domicilios.calle,
-  domicilios.numero,domicilios.numero_domicilio,comunas.nombre_comuna,regiones.nombre_region, usuarios.fecha_creacion, 
+  domicilios.numero,domicilios.numero_domicilio,comunas.cod_comuna,comunas.nombre_comuna,
+  regiones.cod_region,regiones.region_ordinal,regiones.nombre_region, usuarios.fecha_creacion, 
   usuarios.fecha_modificacion, usuarios.modificado_por,instituciones.nombre_institucion
   from usuarios
   join domicilios on usuarios.cod_domicilio=domicilios.cod_domicilio
@@ -24,7 +25,8 @@ userCtrl.obtieneUsuario = async (req, res) => {
     const usuario = await pool.query(
       `
   select usuarios.rut_usuario, usuarios.nombre_usuario, usuarios.apellidos,usuarios.email, domicilios.calle,
-  domicilios.numero,domicilios.numero_domicilio,comunas.nombre_comuna,regiones.nombre_region, usuarios.fecha_creacion, 
+  domicilios.numero,domicilios.numero_domicilio,comunas.cod_comuna,comunas.nombre_comuna,
+  regiones.cod_region,regiones.region_ordinal,regiones.nombre_region, usuarios.fecha_creacion, 
   usuarios.fecha_modificacion, usuarios.modificado_por
   from usuarios
   join domicilios on usuarios.cod_domicilio=domicilios.cod_domicilio
@@ -67,8 +69,59 @@ userCtrl.eliminarUsuario = async (req, res) => {
 //Funcion para actualizar usuarios
 userCtrl.actualizarUsuarios = async (req, res) => {
   const { infoUsuario } = req.body;
-  const actualizar = await dbHelper.ActualizarUsuarios(infoUsuario);
-  res.json(actualizar);
+
+  const actualizaDomicilioUsuario = await pool.query(
+    `update domicilios join usuarios on usuarios.cod_domicilio=domicilios.cod_domicilio 
+    SET domicilios.modificado_por = ?,calle= ?, numero= ?, numero_domicilio= ?, cod_comuna= ? 
+    where rut_usuario = ?`,
+    [
+      infoUsuario.modificadoPor,
+      infoUsuario.calle,
+      infoUsuario.numero,
+      infoUsuario.numeroDomicilio,
+      infoUsuario.codComuna,
+      infoUsuario.rut,
+    ]
+  );
+
+  if(infoUsuario.changePasswd){
+    const claveActualizada = await helpers.encryptPassword(infoUsuario.clave);
+
+    const actualizaDataUsuario = await pool.query(
+      "update usuarios SET nombres= ?, apellidos= ?, email= ?, clave= ?, tipo_usuario= ?,cod_institucion = ?, modificado_por= ? where rut_usuario = ?",
+      [
+        infoUsuario.nombres,
+        infoUsuario.apellidos,
+        infoUsuario.email,
+        claveActualizada,
+        infoUsuario.tipoUsuario,
+        infoUsuario.codInstitucion,
+        infoUsuario.modificadoPor,
+        infoUsuario.rut,
+      ]
+    );
+  }else{
+
+
+    const actualizaDataUsuario = await pool.query(
+      "update usuarios SET nombres= ?, apellidos= ?, email= ?, tipo_usuario= ?,cod_institucion = ?, modificado_por= ? where rut_usuario = ?",
+      [
+        infoUsuario.nombres,
+        infoUsuario.apellidos,
+        infoUsuario.email,
+        infoUsuario.tipoUsuario,
+        infoUsuario.codInstitucion,
+        infoUsuario.modificadoPor,
+        infoUsuario.rut,
+      ]
+    );
+
+
+  }
+
+  
+
+  res.json({ message: "ok" });
 };
 
 module.exports = userCtrl;
