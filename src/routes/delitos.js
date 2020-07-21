@@ -1,7 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const {nuevoDelito,getDelincuente,getDelitos} = require("../controllers/delitos.controller");
+const {
+  nuevoDelito,
+  getDelincuente,
+  getDelitos,
+  getDelincuentes
+} = require("../controllers/delitos.controller");
 
+//Funcion para listar delincuentes
+router.route("/getdelincuentes").get(getDelincuentes);
 
 //Funcion para crear delito
 router.route("/nuevo").post(nuevoDelito);
@@ -17,6 +24,5 @@ router.route("/getdelincuente").post(getDelincuente);
 router.route("/modificar").post();
 //Funcion para liminar delito
 router.route("/eliminar").post();
-
 
 module.exports = router;

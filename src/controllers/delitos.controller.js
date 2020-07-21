@@ -1,6 +1,14 @@
 const delitosCtrl = {};
 const pool = require("../database/dataBase");
 
+//funcion para listar delincuentes
+delitosCtrl.getDelincuentes = async (req, res) => {
+  const delincuentes = await pool.query(
+    `select * from lg_info_delincuentes_detallada`
+  );
+
+  res.json(delincuentes);
+};
 //Funcion para crear un nuevo delito
 delitosCtrl.nuevoDelito = async (req, res) => {
   const { infoDelito } = req.body;

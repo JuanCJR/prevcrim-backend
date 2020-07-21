@@ -1,13 +1,74 @@
 sectoresCtrl = {};
 const pool = require("../database/dataBase");
 
+//Funcion para actualiza sector
+sectoresCtrl.actualizaSector = async (req, res) => {
+  const { sectorInfo } = req.body;
+  await pool.query(
+    `UPDATE sectores set nombre_sector = ?, desc_sector = ?, cod_institucion = ?
+  where cod_sector = ?
+  `,
+    [
+      sectorInfo.nombre_sector,
+      sectorInfo.desc_sector,
+      sectorInfo.cod_institucion,
+      sectorInfo.cod_sector,
+    ]
+  );
+
+  res.json({ message: "ok" });
+};
+
+//modifica comunas del sector
+sectoresCtrl.eliminarComunas = async (req, res) => {
+  const { sectorInfo } = req.body;
+
+  sectorInfo.comunasEliminadas.forEach(async (a) => {
+    await pool.query(`delete from almacen_sectores where cod_almacen = ? `, [
+      a.cod_almacen,
+    ]);
+  });
+
+  res.json({ message: "ok" });
+};
+
+//modifica comunas del sector
+sectoresCtrl.modificarComunas = async (req, res) => {
+  const { sectorInfo } = req.body;
+
+  sectorInfo.comunasDeSector.forEach(async (a) => {
+    await pool.query(
+      `UPDATE almacen_sectores SET cod_comuna = ? where cod_almacen = ? `,
+      [a.cod_comuna, a.cod_almacen]
+    );
+  });
+
+  res.json({ message: "ok" });
+};
+
+//Agrega comunas a un sector
+sectoresCtrl.agregarComunas = async (req, res) => {
+  const { sectorInfo } = req.body;
+  sectorInfo.nuevasComunas.forEach(async (a) => {
+    await pool.query(`INSERT INTO almacen_sectores SET ? `, {
+      cod_sector: sectorInfo.cod_sector,
+      cod_comuna: a.cod_comuna,
+    });
+  });
+
+  res.json({ message: "ok" });
+};
+
 //Funcion para devolver comunas de un sector especifico
 sectoresCtrl.getComunas = async (req, res) => {
   const { cod_sector } = req.query;
   const comunas = await pool.query(`
-  select cod_sector,almacen_sectores.cod_comuna,nombre_comuna 
-  from almacen_sectores
-  join comunas on comunas.cod_comuna = almacen_sectores.cod_comuna
+  select cod_almacen,cod_sector,b.cod_comuna, b.nombre_comuna, 
+  concat(c.region_ordinal,"-",c.nombre_region) as region,
+  c.cod_region, a.cod_almacen 
+  from almacen_sectores a
+  join comunas b on b.cod_comuna=a.cod_comuna
+  join regiones c on c.cod_region=b.cod_region
   where cod_sector=${cod_sector}
   `);
   res.json(comunas);
@@ -63,7 +124,8 @@ sectoresCtrl.getSectores = async (req, res) => {
   sectores.modificado_por   
   FROM sectores
     join instituciones 
-    on instituciones.cod_institucion = sectores.cod_institucion`);
+    on instituciones.cod_institucion = sectores.cod_institucion
+    order by cod_sector asc`);
     res.json(sectores);
   } else {
     const sectores = await pool.query(`SELECT cod_sector, nombre_sector,desc_sector,

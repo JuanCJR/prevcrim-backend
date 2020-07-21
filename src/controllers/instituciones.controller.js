@@ -2,6 +2,21 @@ institucionesCtrl = {};
 const pool = require("../database/dataBase");
 const dbHelper = require("../database/dbHelper");
 
+//lista sectores por institucion
+institucionesCtrl.getSectores = async (req, res) => {
+  const { cod_institucion } = req.query;
+
+  const sectores = await pool.query(
+    `select nombre_sector,desc_sector 
+  from sectores
+  where cod_institucion = ?
+`,
+    [cod_institucion]
+  );
+
+  res.json(sectores);
+};
+
 //Crea Institucion
 institucionesCtrl.creaInstitucion = async (req, res) => {
   const { institucionInfo } = req.body;
@@ -23,36 +38,35 @@ institucionesCtrl.getInstituciones = async (req, res) => {
 
 //Eliminar instituciones
 institucionesCtrl.eliminaInstitucion = async (req, res) => {
-  const {cod_instituciones} =req.body;
+  const { cod_instituciones } = req.body;
   const eliminaInstituciones = await pool.query(
-    `delete from instituciones where cod_instituciones = ?`, [cod_instituciones]
+    `delete from instituciones where cod_instituciones = ?`,
+    [cod_instituciones]
   );
-    if (eliminaInstituciones.affectedRows > 0) {
-      res.json({
-        message: "Institucion Eliminada",
-        code: "delete-true",
-      });
-    } else {
-      res.json({
-        message: "No se ha eliminado la Institución",
-        code: "delete-false",
-      });
-    }
+  if (eliminaInstituciones.affectedRows > 0) {
+    res.json({
+      message: "Institucion Eliminada",
+      code: "delete-true",
+    });
+  } else {
+    res.json({
+      message: "No se ha eliminado la Institución",
+      code: "delete-false",
+    });
+  }
 };
 
 //Actualizar instituciones
-institucionesCtrl.actualizarInstitucion =async (req,res) => {
-  const {institucionInfo} =req.body;
-  const actualizarInstituciones = await pool.query (
-    "update instituciones set nombre_institucion = ?, modificado_por= ? where cod_instituciones= ?",
+institucionesCtrl.actualizarInstitucion = async (req, res) => {
+  const { institucionInfo } = req.body;
+  const actualizarInstituciones = await pool.query(
+    "update instituciones set nombre_institucion = ?, modificado_por= ? where cod_institucion= ?",
     [
       institucionInfo.nombreInstitucion,
       institucionInfo.creadoPor,
-      institucionInfo.cod_instituciones
+      institucionInfo.cod_institucion,
     ]
   );
-
-
 };
 
 module.exports = institucionesCtrl;
