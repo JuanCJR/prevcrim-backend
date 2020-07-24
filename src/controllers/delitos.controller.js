@@ -1,6 +1,91 @@
 const delitosCtrl = {};
 const pool = require("../database/dataBase");
 
+//funcion para crear delincuente
+delitosCtrl.creaDelincuente = async (req, res) => {
+  const { infoDelincuente } = req.body;
+  console.log(infoDelincuente);
+  //insercion en tabla de domicilios
+  const domicilio = await pool.query("INSERT INTO domicilios SET ?", {
+    calle: infoDelincuente.delincuente.calle,
+    numero: infoDelincuente.delincuente.numero,
+    numero_domicilio: infoDelincuente.delincuente.numero_domicilio,
+    cod_comuna: infoDelincuente.delincuente.cod_comuna,
+    modificado_por: infoDelincuente.creadoPor,
+  });
+
+  //insercion en tabla de ultimo visto
+  const ultimo_visto = await pool.query("INSERT INTO ultimo_visto SET ?", {
+    calle: infoDelincuente.ultimo_visto.calle,
+    numero: infoDelincuente.ultimo_visto.numero,
+    numero_domicilio: infoDelincuente.ultimo_visto.numero_domicilio,
+    cod_comuna: infoDelincuente.ultimo_visto.cod_comuna,
+    cod_sector: infoDelincuente.ultimo_visto.cod_sector,
+    modificado_por: infoDelincuente.creadoPor,
+  });
+
+  //insecion en tabla de delincuentes
+  const delincuente = await pool.query(`INSERT INTO delincuentes SET ?`, {
+    rut_delincuente: infoDelincuente.delincuente.rut_delincuente,
+    nombres: infoDelincuente.delincuente.nombres,
+    apellidos: infoDelincuente.delincuente.apellidos,
+    telefono: infoDelincuente.delincuente.telefono,
+    celular: infoDelincuente.delincuente.celular,
+    email: infoDelincuente.delincuente.email,
+    fecha_nacimiento: infoDelincuente.delincuente.fecha_nacimiento,
+    estado_civil: infoDelincuente.delincuente.estado_civil,
+    cod_ultimo_visto: ultimo_visto.insertId,
+    cod_domicilio: domicilio.insertId,
+    modificado_por: infoDelincuente.creadoPor,
+  });
+  res.json({ message: "ok" });
+};
+
+//Funcion para eliminar delito
+delitosCtrl.eliminDelito = async (req, res) => {
+  const { cod_delito } = req.body;
+  await pool.query(
+    `delete delitos,direccion_delito from delitos
+join direccion_delito on direccion_delito.cod_direccion_delito = delitos.cod_direccion_delito
+where cod_delito = ?`,
+    [cod_delito]
+  );
+  res.json({ message: "ok" });
+};
+
+//funcion para eliminar delincuente
+delitosCtrl.eliminaDelincuente = async (req, res) => {
+  const { cod_delincuente } = req.body;
+
+  const delitos = await pool.query(
+    `select * from delitos
+  where cod_delincuente = ?`,
+    [cod_delincuente]
+  );
+  if (delitos.length) {
+    res.json({ message: "delitos-true" });
+  } else {
+    await pool.query(
+      `delete delincuentes,domicilios,ultimo_visto from delincuentes
+join domicilios on delincuentes.cod_domicilio = domicilios.cod_domicilio
+join ultimo_visto on ultimo_visto.cod_ultimo_visto = delincuentes.cod_ultimo_visto
+where cod_delincuente=?`,
+      [cod_delincuente]
+    );
+  }
+};
+
+//funcion para listar delitos de un delincuente
+delitosCtrl.getDelitosPorDelincuente = async (req, res) => {
+  const { cod_delincuente } = req.query;
+
+  const delitos = await pool.query(
+    `select * from lg_info_delitos where cod_delincuente = ?`,
+    [cod_delincuente]
+  );
+  res.json(delitos);
+};
+
 //funcion para listar delincuentes
 delitosCtrl.getDelincuentes = async (req, res) => {
   const delincuentes = await pool.query(

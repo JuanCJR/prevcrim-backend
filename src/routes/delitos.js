@@ -4,8 +4,23 @@ const {
   nuevoDelito,
   getDelincuente,
   getDelitos,
-  getDelincuentes
+  getDelincuentes,
+  getDelitosPorDelincuente,
+  eliminaDelincuente,
+  eliminDelito,
+  creaDelincuente,
 } = require("../controllers/delitos.controller");
+
+//funcion para crear un delincuente
+router.route("/creadelincuente").post(creaDelincuente);
+
+//funcion para eliminar un delito
+router.route("/elimindelito").post(eliminDelito);
+//funcion para eliminar un delincuente
+router.route("/eliminadelincuente").post(eliminaDelincuente);
+
+//funcion para listar delitos por delincuente
+router.route("/getdelitos").get(getDelitosPorDelincuente);
 
 //Funcion para listar delincuentes
 router.route("/getdelincuentes").get(getDelincuentes);

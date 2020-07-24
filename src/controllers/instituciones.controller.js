@@ -38,21 +38,29 @@ institucionesCtrl.getInstituciones = async (req, res) => {
 
 //Eliminar instituciones
 institucionesCtrl.eliminaInstitucion = async (req, res) => {
-  const { cod_instituciones } = req.body;
-  const eliminaInstituciones = await pool.query(
-    `delete from instituciones where cod_instituciones = ?`,
-    [cod_instituciones]
+  const { cod_institucion } = req.body;
+
+  const sectores = await pool.query(
+    `select * from sectores 
+  where cod_institucion = ? `,
+    [cod_institucion]
   );
-  if (eliminaInstituciones.affectedRows > 0) {
-    res.json({
-      message: "Institucion Eliminada",
-      code: "delete-true",
-    });
+
+  const usuarios = await pool.query(
+    `select * from usuarios 
+  where cod_institucion = ? `,
+    [cod_institucion]
+  );
+
+  if (sectores.length) {
+    res.json({ message: "sectores-true" });
+  } else if (usuarios.length) {
+    res.json({ message: "usuarios-true" });
   } else {
-    res.json({
-      message: "No se ha eliminado la Institución",
-      code: "delete-false",
-    });
+    await pool.query(`delete from instituciones where cod_institucion = ?`, [
+      cod_institucion,
+    ]);
+    res.json({ message: "ok" });
   }
 };
 

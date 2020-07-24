@@ -5,9 +5,14 @@ const {
   getSectores,
   getComunas,
   actualizaSector,
-  agregarComunas,modificarComunas,eliminarComunas
+  agregarComunas,
+  modificarComunas,
+  eliminarComunas,
+  eliminaSector,
 } = require("../controllers/sectores.controller");
 
+//Funcion para eliminar sector
+router.route("/eliminasector").all(eliminaSector);
 //Funcion para eliminar comunas a un sector
 router.route("/eliminarcomunas").all(eliminarComunas);
 

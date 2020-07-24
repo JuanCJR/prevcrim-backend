@@ -1,6 +1,53 @@
 sectoresCtrl = {};
 const pool = require("../database/dataBase");
 
+//funcion para eliminar sector
+sectoresCtrl.eliminaSector = async (req, res) => {
+  const { cod_sector, cod_institucion } = req.body;
+
+  const delitos = await pool.query(
+    `select * from direccion_delito
+join delitos on delitos.cod_direccion_delito = direccion_delito.cod_direccion_delito
+where cod_sector = ?`,
+    [cod_sector]
+  );
+
+  const ultimo_visto = await pool.query(
+    `select * from ultimo_visto
+join delincuentes on delincuentes.cod_ultimo_visto = ultimo_visto.cod_ultimo_visto
+where cod_sector = ?`,
+    [cod_sector]
+  );
+  if (delitos.length) {
+    res.json({ message: "delitos-true" });
+  } else if (ultimo_visto.length) {
+    res.json({ message: "delincuentes-true" });
+  } else {
+    await pool.query(
+      `delete from almacen_sectores
+    where cod_sector = ?`,
+      [cod_sector]
+    );
+    await pool.query(
+      `delete from sectores
+    where cod_sector = ?`,
+      [cod_sector]
+    );
+    const institucion = await pool.query(
+      `select sectores from instituciones
+    where cod_institucion= ? `,
+      [cod_institucion]
+    );
+    await pool.query(
+      `update instituciones set sectores = ?
+    where cod_institucion = ?`,
+      [institucion[0].sectores-1, cod_institucion]
+    );
+    res.json({ message: "ok" });
+
+  }
+};
+
 //Funcion para actualiza sector
 sectoresCtrl.actualizaSector = async (req, res) => {
   const { sectorInfo } = req.body;
