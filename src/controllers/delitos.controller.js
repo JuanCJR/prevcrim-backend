@@ -1,10 +1,101 @@
 const delitosCtrl = {};
 const pool = require("../database/dataBase");
 
+//funcion para modificar delito
+delitosCtrl.modificaDelito = async (req, res) => {
+  const { infoDelito } = req.body;
+  //insercion en tabla de direccion de delitos
+  await pool.query(
+    `update direccion_delito join delitos d  
+    on d.cod_direccion_delito = direccion_delito.cod_direccion_delito
+    set calle = ?, numero = ?, numero_domicilio = ?, cod_comuna = ?,
+    cod_sector = ?
+    where cod_delito = ?`,
+    [
+      infoDelito.delito.calle,
+      infoDelito.delito.numero,
+      infoDelito.delito.numero_domicilio,
+      infoDelito.delito.cod_comuna,
+      infoDelito.delito.cod_sector,
+      infoDelito.cod_delito,
+    ]
+  );
+  //insercion en tabla de delitos
+  await pool.query(
+    `update delitos SET desc_delito = ?, tipo_delito = ?,
+  fecha_delito = ? 
+  where cod_delito = ? `,
+    [
+      infoDelito.delito.desc_delito,
+      infoDelito.delito.tipo_delito,
+      infoDelito.delito.fecha_delito,
+      infoDelito.delito.cod_delito,
+    ]
+  );
+
+  res.json({ message: "ok" });
+};
+
+//funcion para modificar delincuente
+delitosCtrl.modificaDelincuente = async (req, res) => {
+  const { infoDelincuente } = req.body;
+  //Actualiza tabla de ultimo visto
+  await pool.query(
+    `update ultimo_visto join delincuentes d on d.cod_ultimo_visto = ultimo_visto.cod_ultimo_visto
+  set calle = ?, numero = ?, numero_domicilio = ?, cod_comuna = ?, cod_sector = ?
+  where rut_delincuente = ?
+  `,
+    [
+      infoDelincuente.ultimo_visto.calle,
+      infoDelincuente.ultimo_visto.numero,
+      infoDelincuente.ultimo_visto.numero_domicilio,
+      infoDelincuente.ultimo_visto.cod_comuna,
+      infoDelincuente.ultimo_visto.cod_sector,
+      infoDelincuente.delincuente.rut_delincuente,
+    ]
+  );
+
+  //Actualiza tabla de domicilios
+  await pool.query(
+    `update domicilios join delincuentes d on d.cod_domicilio = domicilios.cod_domicilio
+  set calle = ?, numero = ?, numero_domicilio = ?, cod_comuna = ?
+  where rut_delincuente = ?
+  `,
+    [
+      infoDelincuente.delincuente.calle,
+      infoDelincuente.delincuente.numero,
+      infoDelincuente.delincuente.numero_domicilio,
+      infoDelincuente.delincuente.cod_comuna,
+      infoDelincuente.delincuente.rut_delincuente,
+    ]
+  );
+
+  //Actualiza tabla de delincuentes
+  await pool.query(
+    `update delincuentes set rut_delincuente = ?, nombres = ?, apellidos = ?,
+    telefono = ?, celular = ?, email = ?, fecha_nacimiento = ?,
+    estado_civil = ?
+    where cod_delincuente = ?
+  `,
+    [
+      infoDelincuente.delincuente.rut_delincuente,
+      infoDelincuente.delincuente.nombres,
+      infoDelincuente.delincuente.apellidos,
+      infoDelincuente.delincuente.telefono,
+      infoDelincuente.delincuente.celular,
+      infoDelincuente.delincuente.email,
+      infoDelincuente.delincuente.fecha_nacimiento,
+      infoDelincuente.delincuente.estado_civil,
+      infoDelincuente.delincuente.cod_delincuente,
+    ]
+  );
+
+  res.json({ message: "ok" });
+};
+
 //funcion para crear delincuente
 delitosCtrl.creaDelincuente = async (req, res) => {
   const { infoDelincuente } = req.body;
-  console.log(infoDelincuente);
   //insercion en tabla de domicilios
   const domicilio = await pool.query("INSERT INTO domicilios SET ?", {
     calle: infoDelincuente.delincuente.calle,
@@ -89,7 +180,7 @@ delitosCtrl.getDelitosPorDelincuente = async (req, res) => {
 //funcion para listar delincuentes
 delitosCtrl.getDelincuentes = async (req, res) => {
   const delincuentes = await pool.query(
-    `select * from lg_info_delincuentes_detallada`
+    `select * from lg_info_delincuentes_detallada order by cod_delincuente desc`
   );
 
   res.json(delincuentes);
@@ -143,6 +234,7 @@ delitosCtrl.nuevoDelito = async (req, res) => {
       tipo_delito: infoDelito.delito.tipo_delito,
       cod_delincuente: delincuente[0].cod_delincuente,
       cod_direccion_delito: direccionDelito.insertId,
+      fecha_delito: infoDelito.delito.fecha_delito,
       modificado_por: infoDelito.creadoPor,
     });
     res.json({ message: "ok" });

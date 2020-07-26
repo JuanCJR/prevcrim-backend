@@ -9,8 +9,15 @@ const {
   eliminaDelincuente,
   eliminDelito,
   creaDelincuente,
+  modificaDelincuente,
+  modificaDelito,
 } = require("../controllers/delitos.controller");
 
+//funcion para modificar delito
+router.route("/modificadelito").post(modificaDelito);
+
+//Funcion para modificar delincuente
+router.route("/modificadelincuente").post(modificaDelincuente);
 //funcion para crear un delincuente
 router.route("/creadelincuente").post(creaDelincuente);
 
